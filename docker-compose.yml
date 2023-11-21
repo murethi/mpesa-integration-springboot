@@ -1,15 +1,14 @@
-version: '3.8'
-
+version: '3'
 services:
   db:
-    image: mysql
-    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
-    # (this is just an example, not intended to be a production configuration)
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
+    container_name: mpesa-integration
+    image: mysql:8.0
+    command: mysqld --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
-      MYSQL_PASSWORD: 'secure#123'
-      MYSQL_ROOT_PASSWORD: 'secure#123'
-      MYSQL_USER: 'user'
+      MYSQL_ROOT_PASSWORD: 'admin@Database'
+      MYSQL_DATABASE: 'mpesa_integration'
+      MYSQL_USER: 'myuser'
+      MYSQL_PASSWORD: 'admin@Database'
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
     ports:
-      - '3306:3306'
+      - '3308:3306'
