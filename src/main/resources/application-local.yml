@@ -1,0 +1,9 @@
+app:
+  integrations:
+    mpesa:
+      access-key: YOUR_ACCESS_KEY
+      access-token: YOUR_ACCESS_TOKEN
+      domain: http://sandbox.safaricom.co.ke
+      shortCode: MPESA_SHORT_CODE
+      express:
+        shortCode: MPESA_SHORT_CODE
