@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -22,11 +21,11 @@ public class MpesaPaymentService {
     private List<String> allowedAccounts = List.of("ACCOUNT_ONE","ACCOUNT_TWO","ACCOUNT_THREE");
 
     /**
-     * on my validation logic, I check whether the account is present
+     * on validation logic, I check whether the account is present
      * I check whether this payment has already been recorded if yes, we return response code 0
      * otherwise we record the apyment and return response code 0
-     * @param payment
-     * @return
+     * @param  payment ConfirmationValidationDto
+     * @return ConfirmationValidationResponse
      */
     public ConfirmationValidationResponse validatePayment(ConfirmationValidationDto payment){
             if(allowedAccounts.contains(payment.BillRefNumber())){
@@ -41,14 +40,7 @@ public class MpesaPaymentService {
                         })
                         .orElseGet(()->{
                             //We record the payment and return a result code of 0
-                            MpesaPayment model = new MpesaPayment();
-                            BeanUtils.copyProperties(payment,model);
-                            model.setStatus(MpesaPaymentStatus.VALIDATED.value);
-                            mpesaPaymentRepository.save(model);
-                            return ConfirmationValidationResponse.builder()
-                                    .ResultCode("0")
-                                    .ResultDesc("Accepted")
-                                    .build();
+                            return savePayment(payment);
 
                         });
             }else{
@@ -59,5 +51,54 @@ public class MpesaPaymentService {
             }
 
 
+    }
+
+    /**
+     * for confirmation, we check if payment had been validated
+     * we go ahead and mark the transaction as confirmed
+     * @param payment
+     * @return ConfirmationValidationResponse
+     */
+    public ConfirmationValidationResponse confirmPayment(ConfirmationValidationDto payment){
+        if(allowedAccounts.contains(payment.BillRefNumber())){
+            return mpesaPaymentRepository.findById(payment.TransID())
+                    .map(mpesaPayment -> {
+                        //Payment had already been validated
+                        mpesaPayment.setStatus(MpesaPaymentStatus.CONFIRMED.value);
+                        mpesaPaymentRepository.save(mpesaPayment);
+                        return ConfirmationValidationResponse.builder()
+                                .ResultCode("0")
+                                .ResultDesc("Accepted")
+                                .build();
+                    })
+                    .orElseGet(()->{
+                        // if you require validation you can throw an exception here
+                        //this is because validation has to happen before confirmation
+                        return savePayment(payment);
+
+                    });
+        }else{
+            return ConfirmationValidationResponse.builder()
+                    .ResultCode("C2B00012")
+                    .ResultDesc("Rejected")
+                    .build();
+        }
+
+
+    }
+
+
+
+
+
+    private ConfirmationValidationResponse savePayment(ConfirmationValidationDto payment){
+        MpesaPayment model = new MpesaPayment();
+        BeanUtils.copyProperties(payment,model);
+        model.setStatus(MpesaPaymentStatus.VALIDATED.value);
+        mpesaPaymentRepository.save(model);
+        return ConfirmationValidationResponse.builder()
+                .ResultCode("0")
+                .ResultDesc("Accepted")
+                .build();
     }
 }
