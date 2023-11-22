@@ -1,11 +1,11 @@
 package com.example.mpesaintegrationspringboot.service;
 
-import com.example.mpesaintegrationspringboot.dto.PaymentRequest;
-import com.example.mpesaintegrationspringboot.dto.StkPushPayload;
-import com.example.mpesaintegrationspringboot.dto.StkPushResponse;
+import com.example.mpesaintegrationspringboot.dto.*;
+import com.example.mpesaintegrationspringboot.dto.stkcallback.StkPushResultBody;
 import com.example.mpesaintegrationspringboot.entity.MpesaExpress;
 import com.example.mpesaintegrationspringboot.http.MpesaClient;
 import com.example.mpesaintegrationspringboot.repository.MpesaExpressRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -75,5 +76,40 @@ public class MpesaExpressService {
 
         return Base64.getEncoder().encodeToString((shortCode + passKey + timestamp).getBytes());
 
+    }
+
+    public void stkpushResult(StkPushResultBody stkPushResultBody) {
+        log.info(stkPushResultBody.toString());
+        String checkoutRequestId = stkPushResultBody.Body().stkCallback().CheckoutRequestID();
+        String merchantRequestID = stkPushResultBody.Body().stkCallback().MerchantRequestID();
+        String resultCode = stkPushResultBody.Body().stkCallback().ResultCode();
+        String resultDesc = stkPushResultBody.Body().stkCallback().ResultDesc();
+        mpesaExpressRepository.findByCheckoutRequestIdAndMerchantRequestId(checkoutRequestId,merchantRequestID)
+                .ifPresent(mpesaExpress -> {
+                    mpesaExpress.setResultCode(resultCode);
+                    mpesaExpress.setResultDescription(resultDesc);
+                    mpesaExpressRepository.save(mpesaExpress);
+                });
+    }
+
+    public StkPushQueryResponse stkPushPaymentQuery(UUID id){
+        return mpesaExpressRepository.findById(id)
+                .map(mpesaExpress -> {
+
+                    String timestamp = timestamp();
+                    String password = password(timestamp);
+                    StkPushQuery stkPushQuery = StkPushQuery.builder()
+                            .Timestamp(timestamp)
+                            .Password(password)
+                            .CheckoutRequestID(mpesaExpress.getCheckoutRequestId())
+                            .BusinessShortCode(shortCode)
+                            .build();
+                    StkPushQueryResponse stkPushQueryResponse = mpesaClient.mpesaExpressQuery(stkPushQuery);
+                    mpesaExpress.setResultCode(stkPushQueryResponse.ResultCode());
+                    mpesaExpress.setResultDescription(stkPushQueryResponse.ResultDesc());
+                    mpesaExpressRepository.save(mpesaExpress);
+                    return stkPushQueryResponse;
+                })
+                .orElseThrow(()->new EntityNotFoundException("Transaction not found"));
     }
 }
