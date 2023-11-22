@@ -1,0 +1,347 @@
+{
+	"info": {
+		"_postman_id": "c5f6f040-f27d-49a8-a6a8-b3d347f9dab9",
+		"name": "mpesa integration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4001477"
+	},
+	"item": [
+		{
+			"name": "gateway",
+			"item": [
+				{
+					"name": "Get Token",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "consumer-secret",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "consumer-key",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+							"protocol": "https",
+							"host": [
+								"sandbox",
+								"safaricom",
+								"co",
+								"ke"
+							],
+							"path": [
+								"oauth",
+								"v1",
+								"generate"
+							],
+							"query": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register urls",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n   \"ShortCode\": \"600990\",\n   \"ResponseType\":\"Completed\",\n   \"ConfirmationURL\":\"https://ed7f-105-163-2-84.ngrok-free.app/payment/confirm\",\n   \"ValidationURL\":\"https://ed7f-105-163-2-84.ngrok-free.app/payment/validate\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl",
+							"protocol": "https",
+							"host": [
+								"sandbox",
+								"safaricom",
+								"co",
+								"ke"
+							],
+							"path": [
+								"mpesa",
+								"c2b",
+								"v1",
+								"registerurl"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stk",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"BusinessShortCode\": \"174379\",\n    \"Password\": \"MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjMxMTIyMDQ0MjU3\",\n    \"Timestamp\": \"20231122044257\",\n    \"TransactionType\": \"CustomerPayBillOnline\",\n    \"Amount\": \"1\",\n    \"PartyA\": \"254708374149\",\n    \"PartyB\": \"174379\",\n    \"PhoneNumber\": \"254797625778\",\n    \"CallBackURL\": \"https://ed7f-105-163-2-84.ngrok-free.app/express-payment/callback\",\n    \"AccountReference\": \"Test\",\n    \"TransactionDesc\": \"Test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+							"protocol": "https",
+							"host": [
+								"sandbox",
+								"safaricom",
+								"co",
+								"ke"
+							],
+							"path": [
+								"mpesa",
+								"stkpush",
+								"v1",
+								"processrequest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "qr code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://sandbox.safaricom.co.ke/mpesa/qrcode/v1/generate",
+							"protocol": "https",
+							"host": [
+								"sandbox",
+								"safaricom",
+								"co",
+								"ke"
+							],
+							"path": [
+								"mpesa",
+								"qrcode",
+								"v1",
+								"generate"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "5mHal0El9yPShtkonVZVQk6uGDG7",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "validation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{    \n   \"TransactionType\": \"Pay Bill\",\n   \"TransID\":\"RKTQDM7W6S\",\n   \"TransTime\":\"20191122063845\",\n   \"TransAmount\":\"10\",\n   \"BusinessShortCode\": \"600638\",\n   \"BillRefNumber\":\"invoice008\",\n   \"InvoiceNumber\":\"\",\n   \"OrgAccountBalance\":\"\",\n   \"ThirdPartyTransID\": \"\",\n   \"MSISDN\":\"25470****149\",\n   \"FirstName\":\"John\",\n   \"MiddleName\":\"\",\n   \"LastName\":\"Doe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/payment/validate",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"payment",
+						"validate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "confirm",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{    \n   \"TransactionType\": \"Pay Bill\",\n   \"TransID\":\"RKTQDM7W6S\",\n   \"TransTime\":\"20191122063845\",\n   \"TransAmount\":\"10\",\n   \"BusinessShortCode\": \"600638\",\n   \"BillRefNumber\":\"invoice008\",\n   \"InvoiceNumber\":\"\",\n   \"OrgAccountBalance\":\"\",\n   \"ThirdPartyTransID\": \"\",\n   \"MSISDN\":\"25470****149\",\n   \"FirstName\":\"John\",\n   \"MiddleName\":\"\",\n   \"LastName\":\"Doe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/payment/confirm",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"payment",
+						"confirm"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getToken",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "register-urls",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{    \n   \"ShortCode\": \"600990\",\n   \"ResponseType\":\"Cancelled\",\n   \"ConfirmationURL\":\"https://1792-105-163-2-84.ngrok-free.app/payment/confirm\",\n   \"ValidationURL\":\"https://1792-105-163-2-84.ngrok-free.app/payment/validate\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/payment/register-urls",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"payment",
+						"register-urls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "stkpush",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\":1,\n    \"phoneNumber\":\"254797625778\",\n    \"transactionDescription\":\"Cool shats\",\n    \"accountReference\":\"ACCOUNT_TWO\",\n    \"callbackUrl\":\"https://ed7f-105-163-2-84.ngrok-free.app/express-payment/callback\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/express-payment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"express-payment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "stkpush Query",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\":1,\n    \"phoneNumber\":\"254797625778\",\n    \"transactionDescription\":\"Cool shats\",\n    \"accountReference\":\"ACCOUNT_TWO\",\n    \"callbackUrl\":\"https://ed7f-105-163-2-84.ngrok-free.app/express-payment/callback\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/express-payment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"express-payment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "generate qr",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/payment/generate-qr",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"payment",
+						"generate-qr"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
