@@ -2,7 +2,10 @@ package com.example.mpesaintegrationspringboot.service;
 
 import com.example.mpesaintegrationspringboot.dto.ConfirmationValidationDto;
 import com.example.mpesaintegrationspringboot.dto.ConfirmationValidationResponse;
+import com.example.mpesaintegrationspringboot.dto.RegisterUrlRequest;
+import com.example.mpesaintegrationspringboot.dto.RegisterUrlResponse;
 import com.example.mpesaintegrationspringboot.entity.MpesaPayment;
+import com.example.mpesaintegrationspringboot.http.MpesaClient;
 import com.example.mpesaintegrationspringboot.repository.MpesaPaymentRepository;
 import com.example.mpesaintegrationspringboot.utils.MpesaPaymentStatus;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import java.util.List;
 public class MpesaPaymentService {
 
     private final MpesaPaymentRepository mpesaPaymentRepository;
+    private final MpesaClient mpesaClient;
 
     //This is a list of account numbers that we have registered on out application
     private List<String> allowedAccounts = List.of("ACCOUNT_ONE","ACCOUNT_TWO","ACCOUNT_THREE");
@@ -87,7 +91,10 @@ public class MpesaPaymentService {
 
     }
 
+    public RegisterUrlResponse registerUrl(RegisterUrlRequest registerUrlRequest){
 
+        return mpesaClient.registerUrl(registerUrlRequest);
+    }
 
 
 

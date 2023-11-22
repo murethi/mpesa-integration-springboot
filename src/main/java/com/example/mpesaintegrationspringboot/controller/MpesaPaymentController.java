@@ -2,6 +2,8 @@ package com.example.mpesaintegrationspringboot.controller;
 
 import com.example.mpesaintegrationspringboot.dto.ConfirmationValidationDto;
 import com.example.mpesaintegrationspringboot.dto.ConfirmationValidationResponse;
+import com.example.mpesaintegrationspringboot.dto.RegisterUrlRequest;
+import com.example.mpesaintegrationspringboot.dto.RegisterUrlResponse;
 import com.example.mpesaintegrationspringboot.service.MpesaPaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,6 +41,12 @@ public class MpesaPaymentController {
     @ResponseStatus(HttpStatus.OK)
     ConfirmationValidationResponse confirmPayment(@RequestBody ConfirmationValidationDto payment){
         return mpesaPaymentService.confirmPayment(payment);
+    }
+
+    @PostMapping("register-urls")
+    @ResponseStatus(HttpStatus.OK)
+    RegisterUrlResponse registerUrls(@RequestBody RegisterUrlRequest registerUrlRequest){
+        return mpesaPaymentService.registerUrl(registerUrlRequest);
     }
 
 }
