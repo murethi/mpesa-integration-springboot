@@ -19,8 +19,11 @@ import java.math.BigDecimal;
  * @param MiddleName
  * @param MiddleName
  */
-public record ConfirmationValidationDto(String TransactionType, String TransID, String TransTime,
-                                        BigDecimal TransAmount, int BusinessShortCode, String BillRefNumber,
+public record ConfirmationValidationDto(String TransactionType,
+                                        String TransID,
+                                        String TransTime,
+                                        BigDecimal TransAmount,
+                                        int BusinessShortCode, String BillRefNumber,
                                         String InvoiceNumber, BigDecimal OrgAccountBalance, String ThirdPartyTransID,
                                         String FirstName,
                                         String MiddleName,

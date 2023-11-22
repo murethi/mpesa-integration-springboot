@@ -13,4 +13,8 @@ public interface MpesaClient {
 
     @PostExchange("/mpesa/stkpushquery/v1/query")
     StkPushQueryResponse mpesaExpressQuery(@RequestBody StkPushQuery stkPushQuery);
+
+
+    @PostExchange("/mpesa/qrcode/v1/generate")
+    QrCodeResponse generateQrCode(@RequestBody QrCodeRequest qrCodeRequest);
 }

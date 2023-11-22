@@ -1,9 +1,6 @@
 package com.example.mpesaintegrationspringboot.service;
 
-import com.example.mpesaintegrationspringboot.dto.ConfirmationValidationDto;
-import com.example.mpesaintegrationspringboot.dto.ConfirmationValidationResponse;
-import com.example.mpesaintegrationspringboot.dto.RegisterUrlRequest;
-import com.example.mpesaintegrationspringboot.dto.RegisterUrlResponse;
+import com.example.mpesaintegrationspringboot.dto.*;
 import com.example.mpesaintegrationspringboot.entity.MpesaPayment;
 import com.example.mpesaintegrationspringboot.http.MpesaClient;
 import com.example.mpesaintegrationspringboot.repository.MpesaPaymentRepository;
@@ -107,5 +104,9 @@ public class MpesaPaymentService {
                 .ResultCode("0")
                 .ResultDesc("Accepted")
                 .build();
+    }
+
+    public QrCodeResponse generateQrCode(QrCodeRequest qrCodeRequest) {
+        return mpesaClient.generateQrCode(qrCodeRequest);
     }
 }
