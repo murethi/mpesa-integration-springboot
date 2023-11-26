@@ -19,4 +19,10 @@ public class MpesaTokenController {
     String getToken(){
         return mpesaAuthenticationService.accessToken();
     }
+
+    @GetMapping("security-credential")
+    @ResponseStatus(HttpStatus.OK)
+    String getSecurityCredential(){
+        return mpesaAuthenticationService.generateSecurityCredential();
+    }
 }
