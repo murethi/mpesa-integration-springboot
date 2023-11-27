@@ -17,4 +17,7 @@ public interface MpesaClient {
 
     @PostExchange("/mpesa/qrcode/v1/generate")
     QrCodeResponse generateQrCode(@RequestBody QrCodeRequest qrCodeRequest);
+
+    @PostExchange("/mpesa/b2c/v3/paymentrequest")
+    B2cDisbursementResponse b2cPaymentRequest(@RequestBody B2cDisbursmentRequest qrCodeRequest);
 }
