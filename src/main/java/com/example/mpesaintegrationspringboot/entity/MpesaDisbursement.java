@@ -37,4 +37,14 @@ public class MpesaDisbursement {
     String ResponseCode;
     @Column(name = "response_description")
     String ResponseDescription;
+    @Column(name = "result_type")
+    String ResultType;
+    @Column(name = "result_code")
+    String ResultCode;
+    @Column(name = "result_description")
+    String ResultDescription;
+    @Column(name = "transaction_id")
+    String TransactionID;
+    @Column(columnDefinition = "boolean default false")
+    boolean QueueTimeout;
 }

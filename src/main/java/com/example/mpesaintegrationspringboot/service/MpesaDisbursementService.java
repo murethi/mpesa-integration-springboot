@@ -3,13 +3,18 @@ package com.example.mpesaintegrationspringboot.service;
 import com.example.mpesaintegrationspringboot.dto.B2cDisbursementResponse;
 import com.example.mpesaintegrationspringboot.dto.B2cDisbursmentRequest;
 import com.example.mpesaintegrationspringboot.dto.InternalDisbursementRequest;
+import com.example.mpesaintegrationspringboot.dto.b2cResult.B2cCallback;
+import com.example.mpesaintegrationspringboot.dto.b2cResult.B2cResult;
 import com.example.mpesaintegrationspringboot.entity.MpesaDisbursement;
 import com.example.mpesaintegrationspringboot.http.MpesaClient;
 import com.example.mpesaintegrationspringboot.repository.MpesaDisbursementRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,8 +45,8 @@ public class MpesaDisbursementService {
                 .InitiatorName(initiatorName)
                 .SecurityCredential(securityCredential)
                 .OriginatorConversationID(model.getId())
-                .QueueTimeOutURL(baseUrl+"/disbursment/"+model.getId())
-                .ResultURL(baseUrl+"/disbursment/timeout/"+model.getId())
+                .QueueTimeOutURL(baseUrl+"/disbursements/"+model.getId()+"/timeout")
+                .ResultURL(baseUrl+"/disbursements/"+model.getId())
                 .build();
         log.info(b2cDisbursmentRequest.toString());
         B2cDisbursementResponse disbursementResponse = mpesaClient.b2cPaymentRequest(b2cDisbursmentRequest);
@@ -67,5 +72,29 @@ public class MpesaDisbursementService {
                 .Amount(disbursementRequest.Amount())
                 .build();
         return mpesaDisbursementRepository.save(model);
+    }
+
+    public void disbursementResult(B2cCallback disbursementResult, UUID id) {
+        mpesaDisbursementRepository.findById(id)
+                .ifPresentOrElse(mpesaDisbursement -> {
+                    B2cResult result = disbursementResult.Result();
+                    mpesaDisbursement.setResultType(result.ResultType());
+                    mpesaDisbursement.setResultCode(result.ResultCode());
+                    mpesaDisbursement.setResultDescription(result.ResultDesc());
+                    mpesaDisbursement.setTransactionID(result.TransactionID());
+                    mpesaDisbursementRepository.save(mpesaDisbursement);
+                },()->{
+                    throw new EntityNotFoundException();
+                });
+    }
+
+    public void disbursementTimeout(UUID id) {
+        mpesaDisbursementRepository.findById(id)
+                .ifPresentOrElse(mpesaDisbursement -> {
+                    mpesaDisbursement.setQueueTimeout(true);
+                    mpesaDisbursementRepository.save(mpesaDisbursement);
+                },()->{
+                    throw new EntityNotFoundException();
+                });
     }
 }
